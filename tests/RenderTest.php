@@ -3,18 +3,18 @@
 namespace Maximaster\Tools\Twig\Test;
 
 use Exception;
-use PHPUnit_Framework_TestCase;
 use Maximaster\Tools\Twig\TwigCacheCleaner;
 use Maximaster\Tools\Twig\TemplateEngine;
+use PHPUnit\Framework\TestCase;
 
-class RenderTest extends PHPUnit_Framework_TestCase
+class RenderTest extends TestCase
 {
     const TEST_VENDOR_NAME = '__phpunit_maximaster';
     const TEST_COMPONENT_NAME = 'tools.twig';
 
     const EXPECTED = 'abcd';
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass() : void
     {
         if (empty($_SERVER['DOCUMENT_ROOT'])) {
             if (!$_SERVER['DOCUMENT_ROOT'] = self::getDocumentRoot()) {
@@ -42,7 +42,7 @@ class RenderTest extends PHPUnit_Framework_TestCase
         }
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass() : void
     {
         if (empty($_SERVER['DOCUMENT_ROOT'])) {
             return;
