@@ -39,6 +39,17 @@ composer update
 
 ## Документация 
 
+### Обязательный момент
+
+В `init.php`:
+
+```php
+// Регистрация Твига
+
+maximasterRegisterTwigTemplateEngine();
+```
+
+
 * **[Синтаксис подключения шаблонов](docs/syntax.md)**
 * **[Доступные переменные и функции внутри шаблонов](docs/twig_extension.md)**
 * **[Конфигурирование](docs/configuration.md)**
