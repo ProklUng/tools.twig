@@ -28,13 +28,14 @@ if (!function_exists('maximasterRenderTwigTemplate')) {
 
     function maximasterRegisterTwigTemplateEngine()
     {
-        $options = new TwigOptionsStorage();
+        // $options = new TwigOptionsStorage();
 
         global $arCustomTemplateEngines;
         $arCustomTemplateEngines['twig'] = array(
             'templateExt' => array('twig'),
             'function' => 'maximasterRenderTwigTemplate',
-            'sort' => $options->getUsedByDefault() ? 1 : 500
+            // 'sort' => $options->getUsedByDefault() ? 1 : 500
+            'sort' => 500
         );
     }
 
