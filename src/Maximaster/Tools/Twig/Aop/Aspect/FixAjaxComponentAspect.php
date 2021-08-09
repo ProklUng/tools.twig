@@ -13,6 +13,8 @@ class FixAjaxComponentAspect implements Aspect
     /**
      * @param MethodInvocation $invocation
      * @Around("execution(public CComponentAjax->CheckSession(*))")
+     *
+     * @return boolean|mixed
      */
     public function aroundCheckSession(MethodInvocation $invocation)
     {
@@ -32,15 +34,11 @@ class FixAjaxComponentAspect implements Aspect
             return false;
         }
 
-        if ($current_session = CAjax::GetSession())
-        {
-            if ($component->componentID == $current_session)
-            {
+        if ($current_session = CAjax::GetSession()) {
+            if ($component->componentID == $current_session) {
                 $component->bAjaxSession = true;
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
@@ -48,6 +46,12 @@ class FixAjaxComponentAspect implements Aspect
         return true;
     }
 
+    /**
+     * @param $componentName
+     * @param $componentTemplate
+     * @param $additionalID
+     * @return false|string
+     */
     protected function getComponentId($componentName, $componentTemplate, $additionalID)
     {
         $foundTrace = false;
@@ -62,12 +66,12 @@ class FixAjaxComponentAspect implements Aspect
             return false;
         }
 
-        return md5(implode('|', array(
+        return md5(implode('|', [
             $foundTrace['file'],
             $foundTrace['line'],
             $componentName,
             $componentTemplate ? strlen($componentName) : '.default',
             $additionalID
-        )));
+        ]));
     }
 }

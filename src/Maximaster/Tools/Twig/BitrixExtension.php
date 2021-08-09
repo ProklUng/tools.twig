@@ -14,13 +14,22 @@ use Twig\TwigFunction;
  */
 class BitrixExtension extends TwigAbstractExtension implements TwigGlobalsInterface
 {
+    /**
+     * @var boolean|null
+     */
     private $isD7 = null;
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return 'bitrix_extension';
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getGlobals(): array
     {
         global $APPLICATION, $USER;
@@ -36,9 +45,11 @@ class BitrixExtension extends TwigAbstractExtension implements TwigGlobalsInterf
         }
 
         return $coreVariables;
-
     }
 
+    /**
+     * @return boolean
+     */
     private function isD7()
     {
         if ($this->isD7 === null) {
@@ -49,7 +60,7 @@ class BitrixExtension extends TwigAbstractExtension implements TwigGlobalsInterf
     }
 
     /**
-     * @return TwigFunction[]
+     * @inheritdoc
      */
     public function getFunctions()
     {
@@ -65,13 +76,21 @@ class BitrixExtension extends TwigAbstractExtension implements TwigGlobalsInterf
     }
 
     /**
-     * @param string $componentName
-     * @param string $componentTemplate
-     * @param array $arParams
+     * @param string            $componentName
+     * @param string            $componentTemplate
+     * @param array             $arParams
      * @param \CBitrixComponent $parentComponent
-     * @param array $arFunctionParams
+     * @param array             $arFunctionParams
+     *
+     * @return void
      */
-    public static function showComponent($componentName, $componentTemplate, $arParams = array(), $parentComponent = null, $arFunctionParams = array())
+    public static function showComponent(
+        $componentName,
+        $componentTemplate,
+        $arParams = [],
+        $parentComponent = null,
+        $arFunctionParams = []
+    ) : void
     {
         global $APPLICATION;
         $APPLICATION->IncludeComponent($componentName, $componentTemplate, $arParams, $parentComponent, $arFunctionParams);

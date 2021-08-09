@@ -11,6 +11,9 @@ use Maximaster\Tools\Twig\Aop\Aspect\FixAjaxComponentAspect;
  */
 class AspectKernel extends \Go\Core\AspectKernel
 {
+    /**
+     * @inheritdoc
+     */
     protected function configureAop(AspectContainer $container)
     {
         $container->registerAspect(new FixAjaxComponentAspect);

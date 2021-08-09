@@ -12,14 +12,20 @@ use Twig\Extension\GlobalsInterface as TwigGlobalsInterface;
  */
 class PhpGlobalsExtension extends TwigAbstractExtension implements TwigGlobalsInterface
 {
+    /**
+     * @return string
+     */
     public function getName()
     {
         return 'php_globals_extension';
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getGlobals(): array
     {
-        return array(
+        return [
             '_SERVER'       => $_SERVER,
             '_REQUEST'      => $_REQUEST,
             '_GET'          => $_GET,
@@ -28,6 +34,6 @@ class PhpGlobalsExtension extends TwigAbstractExtension implements TwigGlobalsIn
             '_SESSION'      => $_SESSION,
             '_COOKIE'       => $_COOKIE,
             '_GLOBALS'      => $GLOBALS,
-        );
+        ];
     }
 }
