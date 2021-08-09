@@ -3,7 +3,6 @@
 use Maximaster\Tools\Twig\TemplateEngine;
 use Maximaster\Tools\Twig\Aop\AspectKernel;
 use Twig\Error\LoaderError as TwigLoaderError;
-use Maximaster\Tools\Twig\TwigOptionsStorage;
 
 if (!function_exists('maximasterRenderTwigTemplate')) {
     function maximasterRenderTwigTemplate(
@@ -28,15 +27,12 @@ if (!function_exists('maximasterRenderTwigTemplate')) {
 
     function maximasterRegisterTwigTemplateEngine()
     {
-        // $options = new TwigOptionsStorage();
-
         global $arCustomTemplateEngines;
-        $arCustomTemplateEngines['twig'] = array(
-            'templateExt' => array('twig'),
+        $arCustomTemplateEngines['twig'] = [
+            'templateExt' => ['twig'],
             'function' => 'maximasterRenderTwigTemplate',
-            // 'sort' => $options->getUsedByDefault() ? 1 : 500
             'sort' => 500
-        );
+        ];
     }
 
     maximasterRegisterTwigTemplateEngine();

@@ -5,7 +5,11 @@ namespace Maximaster\Tools\Twig;
 use Bitrix\Main\Event;
 use Bitrix\Main\EventResult;
 use CBitrixComponentTemplate;
-use Twig\Environment as TwigEnvironment;
+use LogicException;
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use Twig\Extension\DebugExtension as TwigDebugExtension;
 use Twig\Error\Error as TwigError;
 use Bitrix\Main\Localization\Loc;
@@ -18,42 +22,28 @@ use Bitrix\Main\Localization\Loc;
 class TemplateEngine
 {
     /**
-     * @var Twig\Environment
+     * @var Environment
      */
     private $engine;
 
     /**
-     * @var TwigOptionsStorage
+     * @var TwigOptionsStorage $options
      */
     private $options;
 
     /**
-     * Возвращает настроенный инстанс движка Twig
-     * @return Twig\Environment
+     * @var TemplateEngine|null $instance
      */
-    public function getEngine()
-    {
-        return $this->engine;
-    }
-
     private static $instance = null;
 
     /**
-     * Очищает весь кеш твига
-     *
-     * @deprecated начиная с 0.8. Будет удален в 1.0
+     * TemplateEngine constructor.
      */
-    public static function clearAllCache()
-    {
-        $cleaner = new TwigCacheCleaner(self::getInstance()->getEngine());
-        return $cleaner->clearAll();
-    }
-
     public function __construct()
     {
         $this->options = new TwigOptionsStorage();
 
-        $this->engine = new TwigEnvironment(
+        $this->engine = new Environment(
             new BitrixLoader($_SERVER['DOCUMENT_ROOT']),
             $this->options->asArray()
         );
@@ -65,9 +55,33 @@ class TemplateEngine
     }
 
     /**
-     * Инициализируется расширения, необходимые для работы
+     * Возвращает настроенный инстанс движка Twig.
+     *
+     * @return Environment
      */
-    private function initExtensions()
+    public function getEngine() : Environment
+    {
+        return $this->engine;
+    }
+
+    /**
+     * Очищает весь кеш твига.
+     *
+     * @deprecated начиная с 0.8. Будет удален в 1.0.
+     */
+    public static function clearAllCache()
+    {
+        $cleaner = new TwigCacheCleaner(self::getInstance()->getEngine());
+
+        return $cleaner->clearAll();
+    }
+
+    /**
+     * Инициализируется расширения, необходимые для работы.
+     *
+     * @return void
+     */
+    private function initExtensions() : void
     {
         if ($this->engine->isDebug()) {
             $this->engine->addExtension(new TwigDebugExtension());
@@ -79,30 +93,8 @@ class TemplateEngine
     }
 
     /**
-     * Создается событие для внесения в Twig изменения из проекта
+     * @return TemplateEngine|null
      */
-    private function generateInitEvent()
-    {
-        $eventName = 'onAfterTwigTemplateEngineInited';
-        $event = new Event('', $eventName, array('engine' => $this->engine));
-        $event->send();
-        if ($event->getResults()) {
-            foreach ($event->getResults() as $evenResult) {
-                if ($evenResult->getType() == EventResult::SUCCESS) {
-                    $twig = current($evenResult->getParameters());
-                    if (!($twig instanceof TwigEnvironment)) {
-                        throw new \LogicException(
-                            "Событие '{$eventName}' должно возвращать экземпляр класса ".
-                            "'\\TwigEnvironment' при успешной отработке"
-                        );
-                    }
-
-                    $this->engine = $twig;
-                }
-            }
-        }
-    }
-
     public static function getInstance()
     {
         return self::$instance ?: (self::$instance = new self);
@@ -110,16 +102,18 @@ class TemplateEngine
 
     /**
      * Собственно сама функция - рендерер. Принимает все данные о шаблоне и компоненте, выводит в stdout данные.
-     * Содержит дополнительную обработку для component_epilog.php
+     * Содержит дополнительную обработку для component_epilog.php.
      *
-     * @param string $templateFile
-     * @param array $arResult
-     * @param array $arParams
-     * @param array $arLangMessages
-     * @param string $templateFolder
-     * @param string $parentTemplateFolder
+     * @param string                   $templateFile
+     * @param array                    $arResult
+     * @param array                    $arParams
+     * @param array                    $arLangMessages
+     * @param string                   $templateFolder
+     * @param string                   $parentTemplateFolder
      * @param CBitrixComponentTemplate $template
-     * @throws Twig\Error\Error
+     *
+     * @return void
+     * @throws LoaderError | RuntimeError | SyntaxError Ошибки Твига.
      */
     public static function render(
         /** @noinspection PhpUnusedParameterInspection */ $templateFile,
@@ -130,7 +124,7 @@ class TemplateEngine
         $parentTemplateFolder,
         CBitrixComponentTemplate $template
     ) {
-        if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) {
+        if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED!==true) {
             throw new TwigError('Пролог не подключен');
         }
 
@@ -138,7 +132,7 @@ class TemplateEngine
         /** @var BitrixLoader $loader */
         $loader = self::getInstance()->getEngine()->getLoader();
         if (!($loader instanceof BitrixLoader)) {
-            throw new \LogicException(
+            throw new LogicException(
                 "Загрузчиком должен быть 'Maximaster\\Tools\\Twig\\BitrixLoader' или его наследник"
             );
         }
@@ -169,7 +163,7 @@ class TemplateEngine
             $arLangMessages = array_merge($arLangMessages, $templateMess);
         }
 
-        $context = array(
+        $context = [
             'params' => $arParams,
             'lang' => $arLangMessages,
             'template' => $template,
@@ -177,46 +171,83 @@ class TemplateEngine
             'templateFolder' => $templateFolder,
             'parentTemplateFolder' => $parentTemplateFolder,
             'render' => compact('templateName', 'engine'),
-        ) + $context;
+            ] + $context;
 
         echo self::getInstance()->getEngine()->render($templateName, $context);
 
         $component_epilog = $templateFolder . '/component_epilog.php';
         if (file_exists($_SERVER['DOCUMENT_ROOT'] . $component_epilog)) {
             /** @var \CBitrixComponent $component */
-            $component->SetTemplateEpilog(array(
+            $component->SetTemplateEpilog([
                 'epilogFile' => $component_epilog,
                 'templateName' => $template->__name,
                 'templateFile' => $template->__file,
                 'templateFolder' => $template->__folder,
                 'templateData' => false,
-            ));
+            ]);
         }
     }
 
     /**
-     * Рендерит произвольный twig-файл, возвращает результат в виде строки
-     * @param string $src Путь к twig-файлу
-     * @param array $context Контекст
-     * @return string Результат рендера
+     * Рендерит произвольный twig-файл, возвращает результат в виде строки.
+     *
+     * @param string $src     Путь к twig-файлу.
+     * @param array  $context Контекст.
+     *
+     * @return string Результат рендера.
+     * @throws LoaderError | RuntimeError | SyntaxError Ошибки Твига.
      */
-    public static function renderStandalone($src, $context = array())
+    public static function renderStandalone(string $src, array $context = [])
     {
         return self::getInstance()->getEngine()->render($src, $context);
     }
 
     /**
-     * Рендерит произвольный twig-файл, выводит результат в stdout
-     * @param string $src
-     * @param array $context
+     * Рендерит произвольный twig-файл, выводит результат в stdout.
+     *
+     * @param string $src     Путь к twig-файлу.
+     * @param array  $context Контекст.
+     *
+     * @return void
+     * @throws LoaderError | RuntimeError | SyntaxError Ошибки Твига.
      */
-    public static function displayStandalone($src, $context = array())
+    public static function displayStandalone(string $src, array $context = [])
     {
         echo self::renderStandalone($src, $context);
     }
 
+    /**
+     * @return TwigOptionsStorage
+     */
     public function getOptions()
     {
         return $this->options;
+    }
+
+    /**
+     * Создается событие для внесения в Twig изменения из проекта.
+     *
+     * @return void
+     */
+    private function generateInitEvent() : void
+    {
+        $eventName = 'onAfterTwigTemplateEngineInited';
+        $event = new Event('', $eventName, array('engine' => $this->engine));
+        $event->send();
+        if ($event->getResults()) {
+            foreach ($event->getResults() as $evenResult) {
+                if ($evenResult->getType() == EventResult::SUCCESS) {
+                    $twig = current($evenResult->getParameters());
+                    if (!($twig instanceof Environment)) {
+                        throw new LogicException(
+                            "Событие '{$eventName}' должно возвращать экземпляр класса ".
+                            "'\\TwigEnvironment' при успешной отработке"
+                        );
+                    }
+
+                    $this->engine = $twig;
+                }
+            }
+        }
     }
 }

@@ -45,3 +45,13 @@ composer update
 * **[Работа с кешем](docs/working_with_cache.md)**
 * **[Расширение возможностей](docs/extend.md)**
 * **[Тонкости интеграции с битриксом](docs/bitrix_pitfalls.md)**
+
+## Всякое
+
+1) Хэлперы:
+
+ - `Maximaster\Tools\Twig\TemplateEngine::getInstance()->getEngine()` - экземпляр сконфигурированного Твига. 
+ - `Maximaster\Tools\Twig\TemplateEngine::renderStandalone(string $src, array $context = [])` - Рендерит произвольный 
+ twig-файл. Результат возвращается в виде строки.
+ - `Maximaster\Tools\Twig\TemplateEngine::renderStandalone(string $src, array $context = [])` - Рендерит произвольный twig-файл, 
+ выводит результат в stdout.   
