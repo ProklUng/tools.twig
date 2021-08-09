@@ -11,7 +11,7 @@
 "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/lozunoff/tools.twig"
+            "url": "https://github.com/proklUng/tools.twig"
         }
     ],
     "require": {
