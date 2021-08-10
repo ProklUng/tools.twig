@@ -120,7 +120,7 @@ class TwigOptionsStorage implements \ArrayAccess
     /**
      * @return array
      */
-    public function getRuntimes(): bool
+    public function getRuntimes(): array
     {
         return (array)$this->options['runtimes'];
     }
