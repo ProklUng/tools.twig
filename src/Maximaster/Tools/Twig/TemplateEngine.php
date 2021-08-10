@@ -105,7 +105,7 @@ class TemplateEngine
         // Extensions из конфига
         $configExtensions = $this->options->getExtensions();
 
-        foreach ($configExtensions as $configExtension) {
+        foreach ((array)$configExtensions as $configExtension) {
             $extension = is_object($configExtension) ? $configExtension : new $configExtension;
             $this->engine->addExtension($extension);
         }
