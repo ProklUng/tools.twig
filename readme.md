@@ -62,7 +62,6 @@ maximasterRegisterTwigTemplateEngine();
 - ***Runtimes*** - ключ в `settings.php` - `runtimes`. Массив с анонимными классами вида:
 
 ```php
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Twig\Extra\Cache\CacheRuntime;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
@@ -72,12 +71,19 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
     new class implements RuntimeLoaderInterface {
         public function load($class) {
             if (CacheRuntime::class === $class) {
-                return new CacheRuntime(new TagAwareAdapter(new FilesystemAdapter()));
+                return new CacheRuntime(
+                              new \WebArch\BitrixCache\AntiStampedeCacheAdapter(
+                                          '/', 3600, 'cache/s1/twig-cache'
+                              );
             }
         }
     }
 ]    
 ```
+
+Таким образом достигается работы директивы [cache](https://twig.symfony.com/doc/3.x/tags/cache.html).
+
+Кэшером может выступать любой класс, реализующий интерфейс `Symfony\Contracts\Cache\CacheInterface`.
 
 ## Всякое
 
