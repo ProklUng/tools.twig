@@ -107,6 +107,12 @@ class TemplateEngine
 
         foreach ((array)$configExtensions as $configExtension) {
             $extension = is_object($configExtension) ? $configExtension : new $configExtension;
+            if ($this->engine->hasExtension(
+                is_object($configExtension) ? get_class($configExtension) : $configExtension
+            )) {
+                continue;
+            }
+
             $this->engine->addExtension($extension);
         }
     }
