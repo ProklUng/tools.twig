@@ -36,7 +36,8 @@ class TwigOptionsStorage implements \ArrayAccess
             'autoescape' => false,
             'extract_result' => false,
             'use_by_default' => false,
-            'runtimes' => null
+            'runtimes' => [],
+            'extensions' => [],
         ];
     }
 
@@ -125,6 +126,13 @@ class TwigOptionsStorage implements \ArrayAccess
         return (array)$this->options['runtimes'];
     }
 
+    /**
+     * @return array
+     */
+    public function getExtensions(): array
+    {
+        return (array)$this->options['extensions'];
+    }
 
     /**
      * @param mixed $value

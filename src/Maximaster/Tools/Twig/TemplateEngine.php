@@ -101,6 +101,14 @@ class TemplateEngine
         ) {
             $this->engine->addExtension(new CacheExtension());
         }
+
+        // Extensions из конфига
+        $configExtensions = $this->options->getExtensions();
+
+        foreach ($configExtensions as $configExtension) {
+            $extension = is_object($configExtension) ? $configExtension : new $configExtension;
+            $this->engine->addExtension($extension);
+        }
     }
 
     /**

@@ -59,7 +59,22 @@ maximasterRegisterTwigTemplateEngine();
 
 ## Отличный от оригинала функционал
 
-- ***Runtimes*** - ключ в `settings.php` - `runtimes`. Массив с анонимными классами вида:
+- ***Extensions*** - альтернативный способу добавления расширений через события - ключ в `settings.php` (или `settings_extra.php`)
+ - `extensions`:
+ 
+ ```php
+ ...
+ 'extensions' => [
+     new FooExtension(),
+     BarExtension::class
+ ]    
+ ```
+
+Здесь класс FooExtension или BarExtension должны быть наследниками класса `Twig\Extension\AbstractExtension` 
+или имплементировать интерфейс `Twig\Extension\ExtensionInterface`.
+
+- ***Runtimes*** - ключ в `settings.php` (или `settings_extra.php`) - `runtimes`. Массив с анонимными классами
+ вида:
 
 ```php
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
