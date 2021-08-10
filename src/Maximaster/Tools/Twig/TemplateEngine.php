@@ -50,8 +50,9 @@ class TemplateEngine
         );
 
         $this->initExtensions();
-        $this->generateInitEvent();
         $this->initRuntimes();
+
+        $this->generateInitEvent();
 
         self::$instance = $this;
     }
