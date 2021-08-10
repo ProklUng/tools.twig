@@ -35,7 +35,8 @@ class TwigOptionsStorage implements \ArrayAccess
             'auto_reload' => isset($_GET['clear_cache']) && strtoupper($_GET['clear_cache']) == 'Y',
             'autoescape' => false,
             'extract_result' => false,
-            'use_by_default' => false
+            'use_by_default' => false,
+            'runtimes' => null
         ];
     }
 
@@ -48,6 +49,7 @@ class TwigOptionsStorage implements \ArrayAccess
         $config = $c->get('maximaster');
         $twigConfig = isset($config['tools']['twig']) ? (array)$config['tools']['twig'] : [];
         $this->options = array_merge($this->getDefaultOptions(), $twigConfig);
+
         return $this->options;
     }
 
@@ -114,6 +116,15 @@ class TwigOptionsStorage implements \ArrayAccess
     {
         return (bool)$this->options['use_by_default'];
     }
+
+    /**
+     * @return array
+     */
+    public function getRuntimes(): bool
+    {
+        return (array)$this->options['runtimes'];
+    }
+
 
     /**
      * @param mixed $value

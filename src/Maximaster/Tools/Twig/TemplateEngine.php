@@ -13,6 +13,7 @@ use Twig\Error\SyntaxError;
 use Twig\Extension\DebugExtension as TwigDebugExtension;
 use Twig\Error\Error as TwigError;
 use Bitrix\Main\Localization\Loc;
+use Twig\Extra\Cache\CacheExtension;
 
 /**
  * Class TemplateEngine. Небольшой синглтон, который позволяет в процессе работы страницы несколько раз обращаться к
@@ -50,6 +51,7 @@ class TemplateEngine
 
         $this->initExtensions();
         $this->generateInitEvent();
+        $this->initRuntimes();
 
         self::$instance = $this;
     }
@@ -90,6 +92,32 @@ class TemplateEngine
         $this->engine->addExtension(new BitrixExtension());
         $this->engine->addExtension(new PhpGlobalsExtension());
         $this->engine->addExtension(new CustomFunctionsExtension());
+
+        // Для реализации работы директивы cacher
+        if (class_exists(CacheExtension::class)
+            &&
+            !$this->engine->hasExtension(CacheExtension::class)
+        ) {
+            $this->engine->addExtension(new CacheExtension());
+        }
+    }
+
+    /**
+     * Инициализируется runtimes.
+     *
+     * @return void
+     */
+    private function initRuntimes() : void
+    {
+        $runtimes = $this->options->getRuntimes();
+
+        if (!$runtimes) {
+            return;
+        }
+
+        foreach ($runtimes as $runtime) {
+            $this->engine->addRuntimeLoader($runtime);
+        }
     }
 
     /**
