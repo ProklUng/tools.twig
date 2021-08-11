@@ -100,6 +100,19 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 Кэшером может выступать любой класс, реализующий интерфейс `Symfony\Contracts\Cache\CacheInterface`.
 
+- ***Namespaces*** - пространства имен для записи путей к шаблонам вида `@FooNamespace/nice_template.twig`.
+
+ключ в `settings.php` (или `settings_extra.php`) - `namespaces`:
+
+```php
+...
+// ...
+'namespaces' => [
+   '/local/fooTemplates' => 'FooNamespace',
+   '/another_path/templates' => null // Добавится еще один путь, где будут искаться шаблоны.
+]    
+```
+
 ## Всякое
 
 1) Хэлперы:

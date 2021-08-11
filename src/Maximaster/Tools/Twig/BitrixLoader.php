@@ -44,7 +44,7 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
      * @inheritdoc
      * @throws TwigLoaderError
      */
-    protected function findTemplate(string $name, bool $throw = true)
+    protected function findTemplate(string $name, bool $throw = true): ?string
     {
         return $this->getSourcePath($name);
     }
@@ -81,7 +81,7 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
      *
      * @throws TwigLoaderError
      */
-    public function getSourcePath(string $name)
+    public function getSourcePath(string $name): string
     {
         $name = $this->normalizeName($name);
 

@@ -39,13 +39,25 @@ class TemplateEngine
 
     /**
      * TemplateEngine constructor.
+     *
+     * @throws LoaderError Ошибки Твига.
      */
     public function __construct()
     {
         $this->options = new TwigOptionsStorage();
+        $loader = new BitrixLoader($_SERVER['DOCUMENT_ROOT']);
+
+        // Namespaces
+        foreach ($this->options->getNamespaces() as $path => $namespace) {
+            if (!$namespace) {
+                $loader->addPath($_SERVER['DOCUMENT_ROOT'] . $path);
+            } else {
+                $loader->addPath($_SERVER['DOCUMENT_ROOT'] . $path, $namespace);
+            }
+        }
 
         $this->engine = new Environment(
-            new BitrixLoader($_SERVER['DOCUMENT_ROOT']),
+            $loader,
             $this->options->asArray()
         );
 
@@ -72,7 +84,7 @@ class TemplateEngine
      *
      * @deprecated начиная с 0.8. Будет удален в 1.0.
      */
-    public static function clearAllCache()
+    public static function clearAllCache(): int
     {
         $cleaner = new TwigCacheCleaner(self::getInstance()->getEngine());
 
@@ -94,7 +106,7 @@ class TemplateEngine
         $this->engine->addExtension(new PhpGlobalsExtension());
         $this->engine->addExtension(new CustomFunctionsExtension());
 
-        // Для реализации работы директивы cacher
+        // Для реализации работы директивы cache
         if (class_exists(CacheExtension::class)
             &&
             !$this->engine->hasExtension(CacheExtension::class)
@@ -105,7 +117,7 @@ class TemplateEngine
         // Extensions из конфига
         $configExtensions = $this->options->getExtensions();
 
-        foreach ((array)$configExtensions as $configExtension) {
+        foreach ($configExtensions as $configExtension) {
             $extension = is_object($configExtension) ? $configExtension : new $configExtension;
             if ($this->engine->hasExtension(
                 is_object($configExtension) ? get_class($configExtension) : $configExtension
@@ -138,7 +150,7 @@ class TemplateEngine
     /**
      * @return TemplateEngine|null
      */
-    public static function getInstance()
+    public static function getInstance(): ?TemplateEngine
     {
         return self::$instance ?: (self::$instance = new self);
     }
