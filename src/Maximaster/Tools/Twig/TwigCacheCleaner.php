@@ -18,38 +18,17 @@ class TwigCacheCleaner
     /**
      * @var TwigEnvironment $engine
      */
-    protected $engine;
+    private $engine;
 
     /**
      * TwigCacheCleaner constructor.
      *
-     * @param TwigEnvironment $engine
+     * @param TwigEnvironment $engine Twig.
      */
     public function __construct(TwigEnvironment $engine)
     {
         $this->engine = $engine;
         $this->checkCacheEngine();
-    }
-
-    /**
-     * Проверяет, является ли кеш файловым, просто на основании существования директории с кешем.
-     *
-     * @return boolean
-     */
-    private function isFileCache()
-    {
-        return is_dir($this->engine->getCache(true));
-    }
-
-    /**
-     * @return void
-     * @throws LogicException
-     */
-    private function checkCacheEngine()
-    {
-        if (!$this->isFileCache()) {
-            throw new LogicException('Невозможно очистить кеш. Он либо хранится не в файлах, либо кеш отсутствует полностью');
-        }
     }
 
     /**
@@ -60,7 +39,7 @@ class TwigCacheCleaner
      * @return integer Количество удаленных файлов кеша.
      * @throws InvalidArgumentException
      */
-    public function clearByName($name)
+    public function clearByName(string $name)
     {
         if (strlen($name) === 0) {
             throw new InvalidArgumentException('Имя шаблона не задано');
@@ -94,7 +73,7 @@ class TwigCacheCleaner
      *
      * @return integer Количество удаленных файлов кеша.
      */
-    public function clearAll()
+    public function clearAll() : int
     {
         $counter = 0;
 
@@ -115,5 +94,26 @@ class TwigCacheCleaner
         }
 
         return $counter;
+    }
+
+    /**
+     * Проверяет, является ли кеш файловым, просто на основании существования директории с кешем.
+     *
+     * @return boolean
+     */
+    private function isFileCache() : bool
+    {
+        return is_dir($this->engine->getCache(true));
+    }
+
+    /**
+     * @return void
+     * @throws LogicException
+     */
+    private function checkCacheEngine()
+    {
+        if (!$this->isFileCache()) {
+            throw new LogicException('Невозможно очистить кеш. Он либо хранится не в файлах, либо кеш отсутствует полностью');
+        }
     }
 }

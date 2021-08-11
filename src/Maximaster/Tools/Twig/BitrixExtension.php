@@ -90,8 +90,7 @@ class BitrixExtension extends TwigAbstractExtension implements TwigGlobalsInterf
         $arParams = [],
         $parentComponent = null,
         $arFunctionParams = []
-    ) : void
-    {
+    ) : void {
         global $APPLICATION;
         $APPLICATION->IncludeComponent($componentName, $componentTemplate, $arParams, $parentComponent, $arFunctionParams);
     }

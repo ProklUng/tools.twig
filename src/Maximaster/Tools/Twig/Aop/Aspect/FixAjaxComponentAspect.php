@@ -8,6 +8,10 @@ use Go\Lang\Annotation\Around;
 use CComponentAjax;
 use CAjax;
 
+/**
+ * Class FixAjaxComponentAspect
+ * @package Maximaster\Tools\Twig\Aop\Aspect
+ */
 class FixAjaxComponentAspect implements Aspect
 {
     /**
@@ -50,6 +54,7 @@ class FixAjaxComponentAspect implements Aspect
      * @param $componentName
      * @param $componentTemplate
      * @param $additionalID
+     *
      * @return false|string
      */
     protected function getComponentId($componentName, $componentTemplate, $additionalID)
