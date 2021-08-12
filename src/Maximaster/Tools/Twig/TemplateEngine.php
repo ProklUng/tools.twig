@@ -61,7 +61,7 @@ class TemplateEngine
         BitrixLoader $loader,
         ModulesViewsLocator $modulesViewsLocator
     ) {
-        $this->options = new $twigOptionsStorage;
+        $this->options = $twigOptionsStorage;
         $this->modulesViewsLocator = $modulesViewsLocator;
         $this->loader = $loader;
 
