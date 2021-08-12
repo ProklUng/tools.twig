@@ -62,6 +62,7 @@ class TemplateEngine
         );
 
         $this->initExtensions();
+        $this->initGlobals();
         $this->initRuntimes();
 
         $this->generateInitEvent();
@@ -144,6 +145,24 @@ class TemplateEngine
 
         foreach ($runtimes as $runtime) {
             $this->engine->addRuntimeLoader($runtime);
+        }
+    }
+
+    /**
+     * Инициализируется globals.
+     *
+     * @return void
+     */
+    private function initGlobals() : void
+    {
+        $globals = $this->options->getGlobals();
+
+        if (!$globals) {
+            return;
+        }
+
+        foreach ($globals as $global => $value) {
+            $this->engine->addGlobal($global, $value);
         }
     }
 

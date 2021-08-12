@@ -39,6 +39,7 @@ class TwigOptionsStorage implements \ArrayAccess
             'runtimes' => [],
             'extensions' => [],
             'namespaces' => [],
+            'globals' => [],
         ];
     }
 
@@ -141,6 +142,14 @@ class TwigOptionsStorage implements \ArrayAccess
     public function getNamespaces(): array
     {
         return (array)$this->options['namespaces'];
+    }
+
+    /**
+     * @return array
+     */
+    public function getGlobals(): array
+    {
+        return (array)$this->options['globals'];
     }
 
     /**

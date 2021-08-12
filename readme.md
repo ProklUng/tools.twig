@@ -100,9 +100,11 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 Кэшером может выступать любой класс, реализующий интерфейс `Symfony\Contracts\Cache\CacheInterface`.
 
+Для работы такого кэша должен быть установлен пакет `twig/cache-extra`.
+
 - ***Namespaces*** - пространства имен для записи путей к шаблонам вида `@FooNamespace/nice_template.twig`.
 
-ключ в `settings.php` (или `settings_extra.php`) - `namespaces`:
+Ключ в `settings.php` (или `settings_extra.php`) - `namespaces`:
 
 ```php
 ...
@@ -110,6 +112,19 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
 'namespaces' => [
    '/local/fooTemplates' => 'FooNamespace',
    '/another_path/templates' => null // Добавится еще один путь, где будут искаться шаблоны.
+]    
+```
+
+- ***Globals*** - глобальные переменные.
+
+Ключ в `settings.php` (или `settings_extra.php`) - `namespaces`:
+
+```php
+...
+// ...
+'globals' => [
+   'global_var' => 'FooVar',
+   'global_object' => new FooClass(),
 ]    
 ```
 
