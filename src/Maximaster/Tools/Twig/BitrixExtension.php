@@ -22,7 +22,7 @@ class BitrixExtension extends TwigAbstractExtension implements TwigGlobalsInterf
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'bitrix_extension';
     }
@@ -45,18 +45,6 @@ class BitrixExtension extends TwigAbstractExtension implements TwigGlobalsInterf
         }
 
         return $coreVariables;
-    }
-
-    /**
-     * @return boolean
-     */
-    private function isD7()
-    {
-        if ($this->isD7 === null) {
-            $this->isD7 = class_exists('\Bitrix\Main\Application');
-        }
-
-        return $this->isD7;
     }
 
     /**
@@ -93,5 +81,17 @@ class BitrixExtension extends TwigAbstractExtension implements TwigGlobalsInterf
     ) : void {
         global $APPLICATION;
         $APPLICATION->IncludeComponent($componentName, $componentTemplate, $arParams, $parentComponent, $arFunctionParams);
+    }
+
+    /**
+     * @return boolean
+     */
+    private function isD7(): ?bool
+    {
+        if ($this->isD7 === null) {
+            $this->isD7 = class_exists('\Bitrix\Main\Application');
+        }
+
+        return $this->isD7;
     }
 }

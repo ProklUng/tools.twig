@@ -113,7 +113,6 @@ class TwigOptionsStorage implements \ArrayAccess
         return (bool)$this->options['import_from_modules'];
     }
 
-
     /**
      * @return boolean
      */

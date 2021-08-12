@@ -50,7 +50,7 @@ class CustomFunctionsExtension extends TwigAbstractExtension implements TwigGlob
      */
     public static function russianPluralForm(int $howmuch, array $input) : string
     {
-        $howmuch = (int)$howmuch;
+        $howmuch = $howmuch;
         $l2 = substr($howmuch, -2);
         $l1 = substr($howmuch, -1);
         if ($l2 > 10 && $l2 < 20) {

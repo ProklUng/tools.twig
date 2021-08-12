@@ -37,8 +37,7 @@ class ModulesViewsLocator
                 continue;
             }
             
-            $paths = [$pathModule . '/Resources/views', $pathModule . '/templates'];
-            foreach ($paths as $path) {
+            foreach ([$pathModule . '/Resources/views', $pathModule . '/templates'] as $path) {
                 if (@file_exists($dir = $path)) {
                     $result[$module['ID']][] = $dir;
                 }

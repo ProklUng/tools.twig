@@ -15,7 +15,7 @@ class PhpGlobalsExtension extends TwigAbstractExtension implements TwigGlobalsIn
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'php_globals_extension';
     }

@@ -16,7 +16,7 @@ use Twig\Environment as TwigEnvironment;
 class TwigCacheCleaner
 {
     /**
-     * @var TwigEnvironment $engine
+     * @var TwigEnvironment $engine Twig.
      */
     private $engine;
 

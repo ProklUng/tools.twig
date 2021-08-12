@@ -76,7 +76,7 @@ class TemplateEngine
 
         $this->generateInitEvent();
 
-        self::$instance = $this;
+        static::$instance = $this;
     }
 
     /**
@@ -96,7 +96,7 @@ class TemplateEngine
      */
     public static function clearAllCache(): int
     {
-        $cleaner = new TwigCacheCleaner(self::getInstance()->getEngine());
+        $cleaner = new TwigCacheCleaner(static::getInstance()->getEngine());
 
         return $cleaner->clearAll();
     }
@@ -106,6 +106,7 @@ class TemplateEngine
      *
      * @return void
      *
+     * @throws LoaderError
      * @since 12.08.2021
      */
     private function initModulesPath() : void
@@ -203,7 +204,7 @@ class TemplateEngine
      */
     public static function getInstance(): ?TemplateEngine
     {
-        return self::$instance ?: (self::$instance = new self);
+        return static::$instance ?: (static::$instance = new self);
     }
 
     /**
@@ -219,15 +220,15 @@ class TemplateEngine
      * @param CBitrixComponentTemplate $template
      *
      * @return void
-     * @throws LoaderError | RuntimeError | SyntaxError Ошибки Твига.
+     * @throws LoaderError | RuntimeError | SyntaxError | TwigError Ошибки Твига.
      */
     public static function render(
-        /** @noinspection PhpUnusedParameterInspection */ $templateFile,
-        $arResult,
-        $arParams,
-        $arLangMessages,
-        $templateFolder,
-        $parentTemplateFolder,
+        /** @noinspection PhpUnusedParameterInspection */ string $templateFile,
+        array $arResult,
+        array $arParams,
+        array $arLangMessages,
+        string $templateFolder,
+        string $parentTemplateFolder,
         CBitrixComponentTemplate $template
     ) {
         if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED!==true) {
@@ -236,7 +237,7 @@ class TemplateEngine
 
         $component = $template->__component;
         /** @var BitrixLoader $loader */
-        $loader = self::getInstance()->getEngine()->getLoader();
+        $loader = static::getInstance()->getEngine()->getLoader();
         if (!($loader instanceof BitrixLoader)) {
             throw new LogicException(
                 "Загрузчиком должен быть 'Maximaster\\Tools\\Twig\\BitrixLoader' или его наследник"
@@ -245,14 +246,14 @@ class TemplateEngine
 
         $templateName = $loader->makeComponentTemplateName($template);
 
-        $engine = self::getInstance();
+        $engine = static::getInstance();
         $options = $engine->getOptions();
 
         if ($options['extract_result']) {
             $context = $arResult;
             $context['result'] =& $arResult;
         } else {
-            $context = array('result' => $arResult);
+            $context = ['result' => $arResult];
         }
 
         // Битрикс не умеет "лениво" грузить языковые сообщения если они запрашиваются из twig, т.к. ищет вызов
@@ -279,7 +280,7 @@ class TemplateEngine
                 'render' => compact('templateName', 'engine'),
             ] + $context;
 
-        echo self::getInstance()->getEngine()->render($templateName, $context);
+        echo static::getInstance()->getEngine()->render($templateName, $context);
 
         $component_epilog = $templateFolder . '/component_epilog.php';
         if (file_exists($_SERVER['DOCUMENT_ROOT'] . $component_epilog)) {
@@ -303,9 +304,9 @@ class TemplateEngine
      * @return string Результат рендера.
      * @throws LoaderError | RuntimeError | SyntaxError Ошибки Твига.
      */
-    public static function renderStandalone(string $src, array $context = [])
+    public static function renderStandalone(string $src, array $context = []): string
     {
-        return self::getInstance()->getEngine()->render($src, $context);
+        return static::getInstance()->getEngine()->render($src, $context);
     }
 
     /**
@@ -319,13 +320,13 @@ class TemplateEngine
      */
     public static function displayStandalone(string $src, array $context = [])
     {
-        echo self::renderStandalone($src, $context);
+        echo static::renderStandalone($src, $context);
     }
 
     /**
      * @return TwigOptionsStorage
      */
-    public function getOptions()
+    public function getOptions(): TwigOptionsStorage
     {
         return $this->options;
     }
@@ -334,6 +335,7 @@ class TemplateEngine
      * Создается событие для внесения в Twig изменения из проекта.
      *
      * @return void
+     * @throws LogicException Когда что-то неверно с постановкой события.
      */
     private function generateInitEvent() : void
     {

@@ -30,7 +30,7 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
      * <b>vendor:componentname[:template[:specifictemplatefile]]</b><br>
      * Например bitrix:news.list:.default, или bitrix:sale.order:show:step1
      *
-     * @param string $name
+     * @param string $name Шаблон и имя компонента.
      *
      * @return string
      * @throws TwigLoaderError
@@ -74,7 +74,7 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
     public function isFresh(string $name, int $time): bool
     {
         if ($this->isNamespacedTemplate($name)) {
-            return false;
+            return parent::isFresh($name, $time);
         }
 
         return filemtime($this->getSourcePath($name)) <= $time;
@@ -87,7 +87,7 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
      *
      * @return string
      *
-     * @throws TwigLoaderError
+     * @throws TwigLoaderError Ошибки Твига.
      */
     public function getSourcePath(string $name): string
     {
@@ -140,7 +140,7 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
     /**
      * Преобразует имя в максимально-полное начертание
      *
-     * @param string $name
+     * @param string $name Название шаблона.
      *
      * @return string
      */
@@ -185,9 +185,9 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
 
 
     /**
-     * @return false|string
+     * @return string
      */
-    private function getLastRenderedTemplate()
+    private function getLastRenderedTemplate() : string
     {
         $trace = debug_backtrace();
         foreach ($trace as $point) {
@@ -199,7 +199,7 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
             }
         }
 
-        return false;
+        return '';
     }
 
     /**
@@ -250,6 +250,8 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
      * @param string $name Шаблон.
      *
      * @return boolean
+     *
+     * @since 12.08.2021
      */
     private function isNamespacedTemplate(string $name) : bool
     {
