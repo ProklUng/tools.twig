@@ -128,6 +128,25 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
 ]    
 ```
 
+- Импорт `view` из установленных модулей.
+
+Ключ в `settings.php` (или `settings_extra.php`) - `import_from_modules`:
+
+```php
+...
+// ...
+'import_from_modules' => true    
+```
+
+Будут просканированы все установленные модули и добавлены папки `/Resources/view` и `/templates` как пути Твига 
+плюс namespace (ID модуля).
+
+Путь к шаблону:
+
+```php
+Maximaster\Tools\Twig\TemplateEngine::getInstance()->getEngine()->render('@my.module/view.twig')
+```
+
 ## Всякое
 
 1) Хэлперы:

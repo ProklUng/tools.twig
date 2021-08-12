@@ -33,6 +33,11 @@ class TemplateEngine
     private $options;
 
     /**
+     * @var BitrixLoader $loader
+     */
+    private $loader;
+
+    /**
      * @var TemplateEngine|null $instance
      */
     private static $instance = null;
@@ -45,19 +50,23 @@ class TemplateEngine
     public function __construct()
     {
         $this->options = new TwigOptionsStorage();
-        $loader = new BitrixLoader($_SERVER['DOCUMENT_ROOT']);
+        $this->loader = new BitrixLoader($_SERVER['DOCUMENT_ROOT']);
 
         // Namespaces
         foreach ($this->options->getNamespaces() as $path => $namespace) {
             if (!$namespace) {
-                $loader->addPath($_SERVER['DOCUMENT_ROOT'] . $path);
+                $this->loader->addPath($_SERVER['DOCUMENT_ROOT'] . $path);
             } else {
-                $loader->addPath($_SERVER['DOCUMENT_ROOT'] . $path, $namespace);
+                $this->loader->addPath($_SERVER['DOCUMENT_ROOT'] . $path, $namespace);
             }
         }
 
+        if ($this->getOptions()->getImportFromModules()) {
+            $this->initModulesPath();
+        }
+
         $this->engine = new Environment(
-            $loader,
+            $this->loader,
             $this->options->asArray()
         );
 
@@ -90,6 +99,29 @@ class TemplateEngine
         $cleaner = new TwigCacheCleaner(self::getInstance()->getEngine());
 
         return $cleaner->clearAll();
+    }
+
+    /**
+     * Инициализируется директории с шаблонами модулей.
+     *
+     * @return void
+     *
+     * @since 12.08.2021
+     */
+    private function initModulesPath() : void
+    {
+        $moduleViewsLocator = new ModulesViewsLocator();
+        $modulesViews = $moduleViewsLocator->get();
+
+        if (!$modulesViews) {
+            return;
+        }
+
+        foreach ($modulesViews as $moduleId => $dirsView) {
+            foreach ($dirsView as $dirView) {
+                $this->loader->addPath($dirView, $moduleId);
+            }
+        }
     }
 
     /**
@@ -238,13 +270,13 @@ class TemplateEngine
         }
 
         $context = [
-            'params' => $arParams,
-            'lang' => $arLangMessages,
-            'template' => $template,
-            'component' => $component,
-            'templateFolder' => $templateFolder,
-            'parentTemplateFolder' => $parentTemplateFolder,
-            'render' => compact('templateName', 'engine'),
+                'params' => $arParams,
+                'lang' => $arLangMessages,
+                'template' => $template,
+                'component' => $component,
+                'templateFolder' => $templateFolder,
+                'parentTemplateFolder' => $parentTemplateFolder,
+                'render' => compact('templateName', 'engine'),
             ] + $context;
 
         echo self::getInstance()->getEngine()->render($templateName, $context);

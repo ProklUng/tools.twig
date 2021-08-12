@@ -36,6 +36,7 @@ class TwigOptionsStorage implements \ArrayAccess
             'autoescape' => false,
             'extract_result' => false,
             'use_by_default' => false,
+            'import_from_modules' => false,
             'runtimes' => [],
             'extensions' => [],
             'namespaces' => [],
@@ -103,6 +104,15 @@ class TwigOptionsStorage implements \ArrayAccess
     {
         return (bool)$this->options['autoescape'];
     }
+
+    /**
+     * @return boolean
+     */
+    public function getImportFromModules(): bool
+    {
+        return (bool)$this->options['import_from_modules'];
+    }
+
 
     /**
      * @return boolean

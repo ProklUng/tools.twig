@@ -46,6 +46,10 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
      */
     protected function findTemplate(string $name, bool $throw = true): ?string
     {
+        if ($this->isNamespacedTemplate($name)) {
+            return parent::findTemplate($name, $throw);
+        }
+
         return $this->getSourcePath($name);
     }
 
@@ -69,6 +73,10 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
      */
     public function isFresh(string $name, int $time): bool
     {
+        if ($this->isNamespacedTemplate($name)) {
+            return false;
+        }
+
         return filemtime($this->getSourcePath($name)) <= $time;
     }
 
@@ -234,5 +242,21 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
             );
 
         return $templatePath;
+    }
+
+    /**
+     * Определение - шаблон с namespace или нет.
+     *
+     * @param string $name Шаблон.
+     *
+     * @return boolean
+     */
+    private function isNamespacedTemplate(string $name) : bool
+    {
+        if (strpos($name, '@') === 0) {
+            return true;
+        }
+
+        return false;
     }
 }
