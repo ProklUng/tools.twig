@@ -358,7 +358,7 @@ class TemplateEngine
     private function generateInitEvent() : void
     {
         $eventName = 'onAfterTwigTemplateEngineInited';
-        $event = new Event('', $eventName, array('engine' => $this->engine));
+        $event = new Event('', $eventName, ['engine' => $this->engine]);
         $event->send();
         if ($event->getResults()) {
             foreach ($event->getResults() as $evenResult) {
