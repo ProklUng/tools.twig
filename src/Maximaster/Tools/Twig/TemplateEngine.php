@@ -23,17 +23,17 @@ use Twig\Extra\Cache\CacheExtension;
 class TemplateEngine
 {
     /**
-     * @var Environment
+     * @var Environment $engine Твиг.
      */
     private $engine;
 
     /**
-     * @var TwigOptionsStorage $options
+     * @var TwigOptionsStorage $options Опции.
      */
     private $options;
 
     /**
-     * @var BitrixLoader $loader
+     * @var BitrixLoader $loader Загрузчик Твига.
      */
     private $loader;
 
@@ -43,14 +43,27 @@ class TemplateEngine
     private static $instance = null;
 
     /**
+     * @var ModulesViewsLocator $modulesViewsLocator Поиск по модулям.
+     */
+    private $modulesViewsLocator;
+
+    /**
      * TemplateEngine constructor.
+     *
+     * @param TwigOptionsStorage  $twigOptionsStorage  Опции.
+     * @param BitrixLoader        $loader              Загрузчик Твига.
+     * @param ModulesViewsLocator $modulesViewsLocator Поиск по модулям.
      *
      * @throws LoaderError Ошибки Твига.
      */
-    public function __construct()
-    {
-        $this->options = new TwigOptionsStorage();
-        $this->loader = new BitrixLoader($_SERVER['DOCUMENT_ROOT']);
+    public function __construct(
+        TwigOptionsStorage $twigOptionsStorage,
+        BitrixLoader $loader,
+        ModulesViewsLocator $modulesViewsLocator
+    ) {
+        $this->options = new $twigOptionsStorage;
+        $this->modulesViewsLocator = $modulesViewsLocator;
+        $this->loader = $loader;
 
         // Namespaces
         foreach ($this->options->getNamespaces() as $path => $namespace) {
@@ -92,6 +105,7 @@ class TemplateEngine
     /**
      * Очищает весь кеш твига.
      *
+     * @throws LoaderError Ошибки Твига.
      * @deprecated начиная с 0.8. Будет удален в 1.0.
      */
     public static function clearAllCache(): int
@@ -106,13 +120,12 @@ class TemplateEngine
      *
      * @return void
      *
-     * @throws LoaderError
+     * @throws LoaderError Ошибки Твига.
      * @since 12.08.2021
      */
     private function initModulesPath() : void
     {
-        $moduleViewsLocator = new ModulesViewsLocator();
-        $modulesViews = $moduleViewsLocator->get();
+        $modulesViews = $this->modulesViewsLocator->get();
 
         if (!$modulesViews) {
             return;
@@ -201,10 +214,15 @@ class TemplateEngine
 
     /**
      * @return TemplateEngine|null
+     * @throws LoaderError Ошибки Твига.
      */
     public static function getInstance(): ?TemplateEngine
     {
-        return static::$instance ?: (static::$instance = new self);
+        return static::$instance ?: (static::$instance = new self(
+            new TwigOptionsStorage(),
+            new BitrixLoader($_SERVER['DOCUMENT_ROOT']),
+            new ModulesViewsLocator()
+        ));
     }
 
     /**
